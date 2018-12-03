@@ -5,10 +5,13 @@
 
 %função recebe os dados e os retorna com media zero e variança unitaria
 function X = normaliza(dados) 
-[s,tam] = size(dados); %recebe as dimensoes dos dados
-for i=1:tam %para todos os vetores
-    for j=1:s %para todos os atributos desse vetor
-        X(j,i) = (dados(j,i) - mean(dados(:,i)))/std(dados(:,i)); %normaliza o dado
-    end
-    %todos os atributos do vetor i foram normalizados
-end %todos os dados foram normalizados
+[l,c] = size(dados); %recebe as dimensoes dos dados
+X =dados;
+for j=1:c
+    media = mean(dados(:,j));
+    varianca = var(dados(:,j));
+    for i=1:l %para todos os valores de cada vetor
+        X(i,1) = (dados(i,j) - media)/varianca; %normaliza o dado
+        %todos os atributos do vetor i foram normalizados
+    end %todos os dados foram normalizados
+end
