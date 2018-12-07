@@ -7,6 +7,8 @@ clear
 clc
 close all
 
+k = input('Digite o valor de k para o KNN: ');
+
 %Carrega os audios dos comandos
 [d1,~] = audioread('Direita1.m4a');
 [d2,~] = audioread('Direita2.m4a');
@@ -266,7 +268,7 @@ amostras(:,38) = lpc(t8,31);
 amostras(:,39) = lpc(t9,31);
 amostras(:,40) = lpc(t10,31);
 
-%Soma do modulo da TF por intervalo
+%Media do modulo da TF por intervalo de frequencia
 D2 = fftshift(fft(d2));
 D3 = fftshift(fft(d3));
 D4 = fftshift(fft(d4));
@@ -354,15 +356,13 @@ for n=1:20
 end
 
 %testes
-% clear amostras
-for i=1:20
-    amostras(32+n,1:10) = mean(dMediaTF(n,:));
-    amostras(32+n,11:20) = mean(eMediaTF(n,:));
-    amostras(32+n,21:30) = mean(fMediaTF(n,:));
-    amostras(32+n,31:40) = mean(tMediaTF(n,:));
+clear amostras
+for n=1:20
+    amostras(n,1:10) = dMediaTF(n,:);
+    amostras(n,11:20) = eMediaTF(n,:);
+    amostras(n,21:30) = fMediaTF(n,:);
+    amostras(n,31:40) = tMediaTF(n,:);
 end
-
-X = normaliza(amostras); %Normaliza as amostras
 
 %classes
 classes = ones(1,40); %classe Direita 1
@@ -370,18 +370,13 @@ classes(1,11:20) = 2; %classe Esquerda 2
 classes(1,21:30) = 3; %classe frente 3
 classes(1,31:40) = 4; %classe Tras 4
 
-%leave-one-out sem normalização
-% taxa = leaveoneout(amostras, classes); %calcula a taxa de acerto sem a normalização
-% 
-% %leave-one-out com os dados normalizados
-% taxac = leaveoneout(X, classes); %calcula a taxa de acerto com a normalização
-% fprintf('Taxa de acerto do leave-one-out sem a normalização: %.4f\n',taxa);%exibe o percentual de acertos
-% fprintf('Taxa de acerto do leave-one-out com a normalização: %.4f\n',taxac);%exibe o percentual de acertos
-
 %knn
-[X1,Y] = permuta(amostras,classes);
-taxa = knn(X1,Y,5); %taxa de acerto do knn sem normalizar os dados
-[X2,Y] = permuta(X,classes);
-taxac = knn(X2,Y,5); %taxa de acerto do knn com dados normalizados
-fprintf('Taxa de acerto do knn sem a normalização: %.2f\n',taxa);%exibe o percentual de acertos
-fprintf('Taxa de acerto do knn com a normalização: %.2f\n',taxac);%exibe o percentual de acertos
+% [X1,Y] = permuta(amostras,classes);
+% taxa = knn(X1,Y,k); %taxa de acerto do knn sem normalizar os dados
+% fprintf('Taxa de acerto do knn: %.2f\n',taxa);%exibe o percentual de acertos
+taxa =0;
+for i=1:10
+    [X1,Y] = permuta(amostras,classes);
+    taxa = taxa + knn(X1,Y,k); %taxa de acerto do knn sem normalizar os dados
+end
+fprintf('Taxa de acerto do knn: %.2f\n',taxa/10);%exibe o percentual de acertos
